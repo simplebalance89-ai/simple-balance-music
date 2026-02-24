@@ -93,7 +93,7 @@ def render():
         }
         for api_name, connected in apis.items():
             if connected:
-                st.markdown(":green_circle: **" + api_name + ":** Connected")
+                st.success(api_name + ": Connected")
             else:
-                st.markdown(":yellow_circle: **" + api_name + ":** Demo Mode")
+                st.warning(api_name + ": Demo Mode")
 
