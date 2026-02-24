@@ -16,22 +16,22 @@ except ImportError:
 
 
 JIMMY_MIXES = [
-    {"title": "AUG 25 Stream", "filename": "J.A.W.-AUG 25 Stream.mp3", "tags": [+t+,+t+], "energy": 4, "mood": "Driving", "bpm_range": "120-128", "year": "2025"},
-    {"title": "Back Pain", "filename": "J.A.W.-Back Pain.mp3", "tags": [+t+,+t+], "energy": 3, "mood": "Deep", "bpm_range": "118-124", "year": "2025"},
-    {"title": "Crazy Storm", "filename": "J.A.W.-Crazy Storm.mp3", "tags": [+t+,+t+], "energy": 5, "mood": "Euphoric", "bpm_range": "124-132", "year": "2025"},
-    {"title": "Final Headgear", "filename": "J.A.W.-Final Headgear.mp3", "tags": [+t+,+t+], "energy": 4, "mood": "Dark", "bpm_range": "122-130", "year": "2025"},
-    {"title": "Here with you guys", "filename": "J.A.W.-Here with you guys(1).mp3", "tags": [+t+,+t+], "energy": 3, "mood": "Emotional", "bpm_range": "118-126", "year": "2025"},
-    {"title": "Let me think", "filename": "J.A.W.-Let me think.mp3", "tags": [+t+,+t+], "energy": 3, "mood": "Deep", "bpm_range": "116-124", "year": "2025"},
-    {"title": "Letting it Go", "filename": "J.A.W.-Letting it Go.mp3", "tags": [+t+,+t+], "energy": 4, "mood": "Emotional", "bpm_range": "120-128", "year": "2025"},
-    {"title": "Little Behind", "filename": "J.A.W.-Little Behind.mp3", "tags": [+t+,+t+], "energy": 2, "mood": "Chill", "bpm_range": "112-120", "year": "2025"},
-    {"title": "Mommy Night out", "filename": "J.A.W.-Mommy Night out.mp3", "tags": [+t+,+t+], "energy": 4, "mood": "Driving", "bpm_range": "122-130", "year": "2025"},
-    {"title": "No More pacifier", "filename": "J.A.W.-No More pacifier.mp3", "tags": [+t+,+t+], "energy": 3, "mood": "Deep", "bpm_range": "118-126", "year": "2025"},
-    {"title": "Prince of Darkness", "filename": "J.A.W.-Prince of Darkness.mp3", "tags": [+t+,+t+], "energy": 5, "mood": "Dark", "bpm_range": "126-134", "year": "2025"},
-    {"title": "Rainy afternoons", "filename": "J.A.W.-Rainy afternoons.mp3", "tags": [+t+,+t+,+t+], "energy": 2, "mood": "Chill", "bpm_range": "110-118", "year": "2025"},
-    {"title": "REAL AMERICAN", "filename": "J.A.W.-REAL AMERICAN.mp3", "tags": [+t+,+t+], "energy": 5, "mood": "Euphoric", "bpm_range": "126-136", "year": "2025"},
-    {"title": "So Daddy", "filename": "J.A.W.-So Daddy.mp3", "tags": [+t+,+t+], "energy": 3, "mood": "Emotional", "bpm_range": "118-124", "year": "2025"},
-    {"title": "Thanks for having me", "filename": "J.A.W.-Thanks for having me.mp3", "tags": [+t+,+t+], "energy": 3, "mood": "Emotional", "bpm_range": "116-124", "year": "2025"},
-    {"title": "Werid Crowd", "filename": "J.A.W.-Werid Crowd.mp3", "tags": [+t+,+t+], "energy": 4, "mood": "Driving", "bpm_range": "122-130", "year": "2025"},
+    {"title": "AUG 25 Stream", "filename": "J.A.W.-AUG 25 Stream.mp3", "tags": ["house", "stream"], "energy": 4, "mood": "Driving", "bpm_range": "120-128", "year": "2025"},
+    {"title": "Back Pain", "filename": "J.A.W.-Back Pain.mp3", "tags": ["deep", "melodic"], "energy": 3, "mood": "Deep", "bpm_range": "118-124", "year": "2025"},
+    {"title": "Crazy Storm", "filename": "J.A.W.-Crazy Storm.mp3", "tags": ["progressive", "peak"], "energy": 5, "mood": "Euphoric", "bpm_range": "124-132", "year": "2025"},
+    {"title": "Final Headgear", "filename": "J.A.W.-Final Headgear.mp3", "tags": ["techno", "dark"], "energy": 4, "mood": "Dark", "bpm_range": "122-130", "year": "2025"},
+    {"title": "Here with you guys", "filename": "J.A.W.-Here with you guys(1).mp3", "tags": ["melodic", "emotional"], "energy": 3, "mood": "Emotional", "bpm_range": "118-126", "year": "2025"},
+    {"title": "Let me think", "filename": "J.A.W.-Let me think.mp3", "tags": ["deep", "minimal"], "energy": 3, "mood": "Deep", "bpm_range": "116-124", "year": "2025"},
+    {"title": "Letting it Go", "filename": "J.A.W.-Letting it Go.mp3", "tags": ["melodic", "progressive"], "energy": 4, "mood": "Emotional", "bpm_range": "120-128", "year": "2025"},
+    {"title": "Little Behind", "filename": "J.A.W.-Little Behind.mp3", "tags": ["chill", "ambient"], "energy": 2, "mood": "Chill", "bpm_range": "112-120", "year": "2025"},
+    {"title": "Mommy Night out", "filename": "J.A.W.-Mommy Night out.mp3", "tags": ["house", "driving"], "energy": 4, "mood": "Driving", "bpm_range": "122-130", "year": "2025"},
+    {"title": "No More pacifier", "filename": "J.A.W.-No More pacifier.mp3", "tags": ["deep", "house"], "energy": 3, "mood": "Deep", "bpm_range": "118-126", "year": "2025"},
+    {"title": "Prince of Darkness", "filename": "J.A.W.-Prince of Darkness.mp3", "tags": ["dark", "techno"], "energy": 5, "mood": "Dark", "bpm_range": "126-134", "year": "2025"},
+    {"title": "Rainy afternoons", "filename": "J.A.W.-Rainy afternoons.mp3", "tags": ["chill", "ambient", "downtempo"], "energy": 2, "mood": "Chill", "bpm_range": "110-118", "year": "2025"},
+    {"title": "REAL AMERICAN", "filename": "J.A.W.-REAL AMERICAN.mp3", "tags": ["progressive", "euphoric"], "energy": 5, "mood": "Euphoric", "bpm_range": "126-136", "year": "2025"},
+    {"title": "So Daddy", "filename": "J.A.W.-So Daddy.mp3", "tags": ["melodic", "emotional"], "energy": 3, "mood": "Emotional", "bpm_range": "118-124", "year": "2025"},
+    {"title": "Thanks for having me", "filename": "J.A.W.-Thanks for having me.mp3", "tags": ["melodic", "emotional"], "energy": 3, "mood": "Emotional", "bpm_range": "116-124", "year": "2025"},
+    {"title": "Werid Crowd", "filename": "J.A.W.-Werid Crowd.mp3", "tags": ["house", "driving"], "energy": 4, "mood": "Driving", "bpm_range": "122-130", "year": "2025"},
 ]
 
 ARCHIVE_PROMPT = (

@@ -120,11 +120,9 @@ def generate_midi_from_text(prompt, model="gpt-4o", bpm=128, output_path=None):
         )
         abc_text = response.choices[0].message.content.strip()
         if "```" in abc_text:
-            lines = abc_text.split("
-")
+            lines = abc_text.split("\n")
             cleaned = [l for l in lines if not l.strip().startswith("```")]
-            abc_text = "
-".join(cleaned)
+            abc_text = "\n".join(cleaned)
         score = converter.parse(abc_text, format="abc")
         if output_path is None:
             output_path = os.path.join(tempfile.gettempdir(), "sb_generated.mid")

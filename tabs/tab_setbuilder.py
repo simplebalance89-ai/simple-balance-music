@@ -223,11 +223,9 @@ def render():
                     st.session_state.set_tracks = []
                     st.rerun()
             with ac3:
-                exp = "SET LIST
-"
+                exp = "SET LIST\n"
                 for idx, tr in enumerate(tracks):
-                    exp += str(idx+1) + ". " + tr["track"] + "
-"
+                    exp += str(idx+1) + ". " + tr["track"] + "\n"
                 st.download_button("Export", exp, "setlist.md", key="sb_exp")
 
         else:
