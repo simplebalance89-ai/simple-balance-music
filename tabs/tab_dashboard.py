@@ -1,107 +1,99 @@
-"""Tab 10: Simple Balance Dashboard — Activity, stats, calendar, recommendations."""
+"""Tab 10: Dashboard -- Session stats, API status, mau5trap submission checklist."""
 
 import streamlit as st
-from datetime import datetime, timedelta
+from datetime import datetime
 
 
 def render():
-    st.markdown("### Simple Balance Dashboard")
-    st.caption("Peter + Jimmy. Activity feed. Stats. The command center overview.")
+    st.markdown("### Dashboard")
+    st.caption("Session stats. API status. mau5trap submission checklist.")
 
-    # Top metrics
+    # Session stats
+    s = st.session_state.get("stats", {})
     m1, m2, m3, m4 = st.columns(4)
-    with m1:
-        st.metric("Jimmy's Mixes", "18", "+2 this month")
-    with m2:
-        st.metric("Tracked Artists", "12", "+3 new")
-    with m3:
-        st.metric("Upcoming Shows", "3", "Next: 5 days")
-    with m4:
-        st.metric("Sets Built", "0", "Start building!")
+    m1.metric("Queries", s.get("total_queries", 0))
+    tok_in = s.get("total_tokens_in", 0)
+    tok_out = s.get("total_tokens_out", 0)
+    m2.metric("Tokens Used", str(tok_in + tok_out))
+    n_tracks = len(st.session_state.get("set_tracks", []))
+    m3.metric("Set Tracks", n_tracks)
+    m4.metric("Mixes Archived", "18")
 
     st.markdown("---")
 
     col1, col2 = st.columns([2, 1])
 
     with col1:
-        st.markdown("#### Activity Feed")
+        # mau5trap Submission Checklist
+        st.markdown("#### mau5trap Submission Checklist")
+        if "checklist" not in st.session_state:
+            st.session_state.checklist = {
+                "headroom": False,
+                "mastered": False,
+                "clip": False,
+                "info": False,
+                "submitted": False,
+            }
 
-        activities = [
-            {"time": "Today", "icon": "🎧", "text": "Platform launched — Simple Balance Music AI Command Center is live."},
-            {"time": "Today", "icon": "🎵", "text": "18 J.A.W. mixes archived and tagged. Full catalog searchable."},
-            {"time": "Today", "icon": "📡", "text": "Event radar active — tracking 12 artists across LA, Miami, Vegas."},
-            {"time": "Upcoming", "icon": "🎸", "text": "MGK Lost Americana Tour — West Palm Beach, May 27, 2026. Peter + Jimmy confirmed."},
-        ]
+        cl = st.session_state.checklist
+        cl["headroom"] = st.checkbox("Track mixed to -6dB headroom", value=cl["headroom"], key="cl_head")
+        cl["mastered"] = st.checkbox("Mastered to streaming specs (-14 LUFS)", value=cl["mastered"], key="cl_master")
+        cl["clip"] = st.checkbox("Best 20-second clip identified", value=cl["clip"], key="cl_clip")
+        cl["info"] = st.checkbox("Track info filled (title, BPM, key, genre)", value=cl["info"], key="cl_info")
+        cl["submitted"] = st.checkbox("Submitted via demos@mau5trap.com or LabelRadar", value=cl["submitted"], key="cl_sub")
 
-        for a in activities:
-            st.markdown(f"""
-{a['icon']} **{a['time']}** — {a['text']}
-""")
-
-        st.markdown("---")
-        st.markdown("#### Upcoming Shows Calendar")
-
-        shows = [
-            {"date": "May 27, 2026", "event": "MGK Lost Americana Tour", "location": "West Palm Beach", "who": "Peter + Jimmy"},
-        ]
-
-        for show in shows:
-            st.markdown(f"""
-**{show['date']}** — {show['event']}
-{show['location']} | {show['who']}
-""")
+        done = sum(1 for v in cl.values() if v)
+        total = len(cl)
+        st.progress(done / total, text=str(done) + "/" + str(total) + " complete")
+        if done == total:
+            st.success("Ready to submit to mau5trap!")
+        st.markdown("**Submit via:** demos@mau5trap.com or [LabelRadar](https://www.labelradar.com)")
 
         st.markdown("---")
-        st.markdown("#### Sinton.ia Music Recommendations")
-        st.markdown("""
-Based on Peter's recent activity and mood patterns:
+        # Activity feed
+        st.markdown("#### Recent Activity")
+        if "activity_feed" not in st.session_state:
+            st.session_state.activity_feed = [
+                "Platform launched -- Simple Balance Music AI Command Center is live.",
+                "18 J.A.W. mixes archived and tagged. Full catalog searchable.",
+                "MIDI generators online -- chord, drum, and bass patterns.",
+                "mau5trap submission checklist activated.",
+            ]
+        for item in st.session_state.activity_feed:
+            st.markdown("- " + item)
 
-**This Week's Picks:**
-- **Township Rebellion — New Release** — Melodic, emotional. Jimmy turned Peter onto them.
-- **Glowal — Latest Mix** — The Sinton.ia origin artist. Always worth a listen.
-- **Brunello — Deep Cut** — Lost In The Mellow Circus vibes. Late night material.
-""")
+        st.markdown("---")
+        # Quick links
+        st.markdown("#### Quick Links")
+        links = [
+            ("Tab 1", "J.A.W. DJ Command"),
+            ("Tab 2", "Music Discovery"),
+            ("Tab 3", "AI Mastering Studio"),
+            ("Tab 4", "Stem Separation Lab"),
+            ("Tab 5", "AI Music Generation"),
+            ("Tab 6", "Festival & Events Radar"),
+            ("Tab 7", "Set Builder"),
+            ("Tab 8", "Mix Archive"),
+            ("Tab 9", "Producer Tools"),
+        ]
+        qcols = st.columns(3)
+        for i, (num, name) in enumerate(links):
+            qcols[i % 3].markdown("**" + num + ":** " + name)
 
     with col2:
-        st.markdown("#### Quick Stats")
-
-        st.markdown("**Peter's Top Genres:**")
-        genres = {"Melodic House & Techno": 45, "Progressive House": 25, "Deep House": 15, "Tech House": 10, "Ambient": 5}
-        for genre, pct in genres.items():
-            st.progress(pct / 100, text=f"{genre} ({pct}%)")
-
-        st.markdown("---")
-        st.markdown("**Jimmy's Mix Moods:**")
-        moods = {"Emotional": 4, "Driving": 3, "Dark": 2, "Deep": 3, "Chill": 2, "Euphoric": 2}
-        for mood, count in moods.items():
-            bar = "█" * count + "░" * (6 - count)
-            st.markdown(f"`{bar}` {mood} ({count})")
-
-        st.markdown("---")
-        st.markdown("#### Platform Status")
-
+        # API Status
+        st.markdown("#### API Status")
         apis = {
-            "Azure OpenAI": True,
-            "Beatport": st.secrets.get("BEATPORT_API_KEY", "") != "",
-            "EDMTrain": st.secrets.get("EDMTRAIN_API_KEY", "") != "",
-            "Last.fm": st.secrets.get("LASTFM_API_KEY", "") != "",
-            "Bandsintown": st.secrets.get("BANDSINTOWN_APP_ID", "") != "",
-            "Mubert": st.secrets.get("MUBERT_API_KEY", "") != "",
-            "Dolby.io": st.secrets.get("DOLBY_API_KEY", "") != "",
+            "Azure OpenAI": bool(st.secrets.get("AZURE_OPENAI_KEY", "")),
+            "Replicate": bool(st.secrets.get("REPLICATE_API_TOKEN", "")),
+            "Dolby.io": bool(st.secrets.get("DOLBY_API_KEY", "")),
+            "Last.fm": bool(st.secrets.get("LASTFM_API_KEY", "")),
+            "EDMTrain": bool(st.secrets.get("EDMTRAIN_API_KEY", "")),
+            "Bandsintown": bool(st.secrets.get("BANDSINTOWN_APP_ID", "")),
         }
+        for api_name, connected in apis.items():
+            if connected:
+                st.markdown(":green_circle: **" + api_name + ":** Connected")
+            else:
+                st.markdown(":yellow_circle: **" + api_name + ":** Demo Mode")
 
-        for api, connected in apis.items():
-            status = "Connected" if connected else "Demo Mode"
-            icon = "🟢" if connected else "🟡"
-            st.markdown(f"{icon} **{api}:** {status}")
-
-        st.markdown("---")
-        st.markdown("#### The Brothers")
-        st.markdown("""
-**Peter** — Curator. Finds, pushes, speaks.
-**Jimmy** — Amplifier. Takes it and makes it 5x.
-
-*"1 person is 2."*
-
-Simple Balance isn't just Peter + Jimmy. It's the third mind.
-""")
