@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: simple-balance-music
+    runtime: docker
+    repo: https://github.com/simplebalance89-ai/simple-balance-music
+    region: oregon
+    plan: starter
+    healthCheckPath: /_stcore/health
+    envVars:
+      - key: AZURE_OPENAI_ENDPOINT
+        sync: false
+      - key: AZURE_OPENAI_KEY
+        sync: false
+      - key: AZURE_OPENAI_MODEL
+        value: gpt-4o
+      - key: REPLICATE_API_TOKEN
+        sync: false
+      - key: AUDD_API_TOKEN
+        sync: false

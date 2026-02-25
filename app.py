@@ -3,6 +3,7 @@ Simple Balance - Music AI Production Suite v2.0
 J.A.W. | Peter + Jimmy Wilson | Production Edition
 """
 
+import os
 import streamlit as st
 from datetime import datetime
 
@@ -25,27 +26,24 @@ if "stats" not in st.session_state:
 
 
 # --- API Status Check ---
+def _get_secret(key):
+    """Get secret from Streamlit secrets or env vars."""
+    try:
+        val = st.secrets.get(key, "")
+        if val:
+            return val
+    except Exception:
+        pass
+    return os.environ.get(key, "")
+
+
 def _check_api_status():
     """Check which APIs are configured."""
     status = {}
-    try:
-        status["Replicate"] = bool(st.secrets.get("REPLICATE_API_TOKEN", ""))
-    except Exception:
-        status["Replicate"] = False
-    try:
-        status["Dolby.io"] = bool(st.secrets.get("DOLBY_API_KEY", ""))
-    except Exception:
-        status["Dolby.io"] = False
-    try:
-        ep = st.secrets.get("AZURE_OPENAI_ENDPOINT", "")
-        k = st.secrets.get("AZURE_OPENAI_KEY", "")
-        status["Azure OpenAI"] = bool(ep and k)
-    except Exception:
-        status["Azure OpenAI"] = False
-    try:
-        status["AudD"] = bool(st.secrets.get("AUDD_API_TOKEN", ""))
-    except Exception:
-        status["AudD"] = False
+    status["Replicate"] = bool(_get_secret("REPLICATE_API_TOKEN"))
+    status["Dolby.io"] = bool(_get_secret("DOLBY_API_KEY"))
+    status["Azure OpenAI"] = bool(_get_secret("AZURE_OPENAI_ENDPOINT") and _get_secret("AZURE_OPENAI_KEY"))
+    status["AudD"] = bool(_get_secret("AUDD_API_TOKEN"))
     return status
 
 
