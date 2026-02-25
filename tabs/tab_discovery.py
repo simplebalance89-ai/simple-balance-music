@@ -14,6 +14,18 @@ try:
 except ImportError:
     HAS_TIDAL = False
 
+try:
+    from utils.spotify_client import (
+        is_available as spotify_available, get_client as spotify_client,
+        handle_auth_callback, get_auth_url, get_user_profile,
+        get_top_tracks, get_saved_tracks, get_playlists as spotify_playlists,
+        get_playlist_tracks as spotify_playlist_tracks, get_recently_played,
+        get_audio_features, search_tracks as spotify_search,
+    )
+    HAS_SPOTIFY = spotify_available()
+except ImportError:
+    HAS_SPOTIFY = False
+
 DISCOVERY_SYSTEM_PROMPT = """You are Peter's music discovery assistant — Simple Balance. You find songs based on mood, meaning, and connection — not just genre. Music is how Peter processes. It's communication, memory, and healing — not background noise.
 
 PETER'S MUSICAL ARC:
@@ -194,6 +206,79 @@ def render():
                             st.rerun()
                         else:
                             st.warning("Not yet. Finish logging in at the link above, then try again.")
+
+        # --- SPOTIFY CONNECT ---
+        st.markdown("---")
+        st.markdown("#### 🟢 Spotify Connect")
+        if not HAS_SPOTIFY:
+            st.caption("Spotify integration not available (install spotipy)")
+        else:
+            if handle_auth_callback():
+                st.rerun()
+
+            client = spotify_client()
+            if client:
+                profile = get_user_profile(client)
+                if "error" not in profile:
+                    st.success(f"Connected: {profile.get('display_name', 'Spotify User')}")
+                else:
+                    st.success("Connected to Spotify")
+
+                spot_action = st.selectbox("What to pull?", [
+                    "Top Tracks", "Saved Tracks", "Recently Played", "My Playlists"
+                ], key="spot_action")
+
+                if st.button("Pull", key="spot_pull"):
+                    if spot_action == "Top Tracks":
+                        tracks = get_top_tracks(client, time_range="medium_term", limit=20)
+                        track_ids = [t["id"] for t in tracks if "error" not in t and t.get("id")]
+                        features = {}
+                        if track_ids:
+                            af = get_audio_features(client, track_ids[:20])
+                            features = {f["id"]: f for f in af if "error" not in f}
+                        for t in tracks:
+                            if "error" not in t:
+                                f = features.get(t.get("id"), {})
+                                bpm = f.get("bpm", "")
+                                key = f.get("key", "")
+                                energy = f.get("energy", "")
+                                extra = f" | {bpm} BPM | {key} | E:{energy}" if bpm else ""
+                                st.markdown(f"**{t['name']}** — {t['artist']}{extra}")
+
+                    elif spot_action == "Saved Tracks":
+                        tracks = get_saved_tracks(client, limit=20)
+                        for t in tracks:
+                            if "error" not in t:
+                                st.markdown(f"**{t['name']}** — {t['artist']}")
+
+                    elif spot_action == "Recently Played":
+                        tracks = get_recently_played(client, limit=20)
+                        for t in tracks:
+                            if "error" not in t:
+                                st.markdown(f"**{t['name']}** — {t['artist']}")
+
+                    elif spot_action == "My Playlists":
+                        pls = spotify_playlists(client, limit=20)
+                        for p in pls:
+                            if "error" not in p:
+                                st.markdown(f"**{p['name']}** ({p['num_tracks']} tracks)")
+
+                spot_q = st.text_input("Search Spotify", key="spot_search_q", placeholder="Search tracks...")
+                if st.button("Search", key="spot_search_go") and spot_q:
+                    results = spotify_search(client, spot_q, limit=15)
+                    for t in results:
+                        if "error" not in t:
+                            dur = f"{t.get('duration_sec', 0) // 60}:{t.get('duration_sec', 0) % 60:02d}"
+                            st.markdown(f"**{t['name']}** — {t['artist']} ({dur})")
+
+                if st.button("Disconnect Spotify", key="spot_disconnect"):
+                    st.session_state.pop("spotify_token_info", None)
+                    st.rerun()
+            else:
+                st.caption("Connect your Spotify account to pull your library.")
+                auth_url = get_auth_url()
+                if auth_url:
+                    st.link_button("Connect Spotify", auth_url)
 
     with col1:
         chat_key = "discovery_messages"
