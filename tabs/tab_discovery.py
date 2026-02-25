@@ -4,6 +4,16 @@ import streamlit as st
 from utils.ai_client import chat
 from utils.apis import get_lastfm_trending, search_lastfm_artist
 
+try:
+    from utils.tidal_client import (
+        is_available as tidal_available, get_session as tidal_session,
+        start_login, complete_login, get_favorites, get_playlists,
+        get_playlist_tracks, search_tracks as tidal_search,
+    )
+    HAS_TIDAL = tidal_available()
+except ImportError:
+    HAS_TIDAL = False
+
 DISCOVERY_SYSTEM_PROMPT = """You are Peter's music discovery assistant — Simple Balance. You find songs based on mood, meaning, and connection — not just genre. Music is how Peter processes. It's communication, memory, and healing — not background noise.
 
 PETER'S MUSICAL ARC:
@@ -126,6 +136,64 @@ def render():
         for mood, prompt_text in moods.items():
             if st.button(mood, key=f"mood_{mood}"):
                 st.session_state["disc_auto_prompt"] = prompt_text
+
+        # --- TIDAL CONNECT ---
+        st.markdown("---")
+        st.markdown("#### 🎵 Tidal Connect")
+        if not HAS_TIDAL:
+            st.caption("Tidal integration not available (install tidalapi)")
+        else:
+            session = tidal_session()
+            if session:
+                st.success("Connected to Tidal")
+                if st.button("My Favorites", key="tidal_favs"):
+                    favs = get_favorites(session, limit=20)
+                    for t in favs:
+                        if "error" not in t:
+                            st.markdown(f"**{t['name']}** — {t['artist']}")
+                        else:
+                            st.error(t["error"])
+
+                if st.button("My Playlists", key="tidal_playlists"):
+                    pls = get_playlists(session)
+                    for p in pls:
+                        if "error" not in p:
+                            if st.button(f"📋 {p['name']} ({p['num_tracks']} tracks)", key=f"tpl_{p['id']}"):
+                                tracks = get_playlist_tracks(session, p["id"], limit=30)
+                                for t in tracks:
+                                    if "error" not in t:
+                                        st.markdown(f"**{t['name']}** — {t['artist']}")
+
+                tidal_q = st.text_input("Search Tidal", key="tidal_search_q", placeholder="Search tracks...")
+                if st.button("Search", key="tidal_search_go") and tidal_q:
+                    results = tidal_search(session, tidal_q, limit=15)
+                    for t in results:
+                        if "error" not in t:
+                            dur = f"{t.get('duration_sec', 0) // 60}:{t.get('duration_sec', 0) % 60:02d}" if t.get("duration_sec") else ""
+                            st.markdown(f"**{t['name']}** — {t['artist']} ({dur})")
+
+                if st.button("Disconnect Tidal", key="tidal_disconnect"):
+                    st.session_state.pop("tidal_session", None)
+                    st.rerun()
+            else:
+                st.caption("Connect your Tidal account to pull your library.")
+                if st.button("Connect Tidal", key="tidal_connect"):
+                    login, future = start_login()
+                    if login:
+                        st.session_state["tidal_auth_url"] = login.verification_uri_complete
+                        st.rerun()
+
+                if "tidal_auth_url" in st.session_state:
+                    st.markdown(f"**1.** Open this link and log in:")
+                    st.code(st.session_state["tidal_auth_url"])
+                    st.markdown("**2.** After logging in, click below:")
+                    if st.button("I've logged in", key="tidal_verify"):
+                        if complete_login():
+                            st.session_state.pop("tidal_auth_url", None)
+                            st.success("Connected!")
+                            st.rerun()
+                        else:
+                            st.warning("Not yet. Finish logging in at the link above, then try again.")
 
     with col1:
         chat_key = "discovery_messages"
