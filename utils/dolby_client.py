@@ -22,9 +22,8 @@ DOLBY_API_BASE = "https://api.dolby.com/media/"
 
 
 def _get_api_key() -> str:
-    if st is not None:
-        return st.secrets.get("DOLBY_API_KEY", "")
-    return ""
+    from utils.secrets_helper import get_secret
+    return get_secret("DOLBY_API_KEY")
 
 
 def _is_connected() -> bool:

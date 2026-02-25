@@ -3,13 +3,14 @@
 import streamlit as st
 from openai import AzureOpenAI
 import time
+from utils.secrets_helper import get_secret
 
 
 def get_client():
     """Get configured Azure OpenAI client."""
     return AzureOpenAI(
-        azure_endpoint=st.secrets.get("AZURE_OPENAI_ENDPOINT", ""),
-        api_key=st.secrets.get("AZURE_OPENAI_KEY", ""),
+        azure_endpoint=get_secret("AZURE_OPENAI_ENDPOINT"),
+        api_key=get_secret("AZURE_OPENAI_KEY"),
         api_version="2024-12-01-preview",
     )
 
@@ -17,7 +18,7 @@ def get_client():
 def chat(system_prompt: str, messages: list, temperature: float = 0.3) -> str:
     """Send chat completion and return response text."""
     client = get_client()
-    model = st.secrets.get("AZURE_OPENAI_MODEL", "gpt-4o")
+    model = get_secret("AZURE_OPENAI_MODEL", "gpt-4o")
 
     api_messages = [{"role": "system", "content": system_prompt}]
     for msg in messages:

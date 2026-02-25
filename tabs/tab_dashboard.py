@@ -83,13 +83,14 @@ def render():
     with col2:
         # API Status
         st.markdown("#### API Status")
+        from utils.secrets_helper import get_secret
         apis = {
-            "Azure OpenAI": bool(st.secrets.get("AZURE_OPENAI_KEY", "")),
-            "Replicate": bool(st.secrets.get("REPLICATE_API_TOKEN", "")),
-            "Dolby.io": bool(st.secrets.get("DOLBY_API_KEY", "")),
-            "Last.fm": bool(st.secrets.get("LASTFM_API_KEY", "")),
-            "EDMTrain": bool(st.secrets.get("EDMTRAIN_API_KEY", "")),
-            "Bandsintown": bool(st.secrets.get("BANDSINTOWN_APP_ID", "")),
+            "Azure OpenAI": bool(get_secret("AZURE_OPENAI_KEY")),
+            "Replicate": bool(get_secret("REPLICATE_API_TOKEN")),
+            "Dolby.io": bool(get_secret("DOLBY_API_KEY")),
+            "Last.fm": bool(get_secret("LASTFM_API_KEY")),
+            "EDMTrain": bool(get_secret("EDMTRAIN_API_KEY")),
+            "Bandsintown": bool(get_secret("BANDSINTOWN_APP_ID")),
         }
         for api_name, connected in apis.items():
             if connected:

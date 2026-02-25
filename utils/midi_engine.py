@@ -97,8 +97,9 @@ def generate_midi_from_text(prompt, model="gpt-4o", bpm=128, output_path=None):
     endpoint = ""
     api_key = ""
     if st is not None:
-        endpoint = st.secrets.get("AZURE_OPENAI_ENDPOINT", "")
-        api_key = st.secrets.get("AZURE_OPENAI_KEY", "")
+        from utils.secrets_helper import get_secret
+        endpoint = get_secret("AZURE_OPENAI_ENDPOINT")
+        api_key = get_secret("AZURE_OPENAI_KEY")
     if not endpoint or not api_key:
         return _mock_midi_generation(prompt, "Azure OpenAI not configured")
     try:

@@ -3,12 +3,13 @@
 import requests
 import streamlit as st
 from datetime import datetime, timedelta
+from utils.secrets_helper import get_secret
 
 
 # --- EDMTrain API ---
 def get_edmtrain_events(city: str = "Los Angeles", days_ahead: int = 30) -> list:
     """Fetch upcoming EDM events from EDMTrain."""
-    api_key = st.secrets.get("EDMTRAIN_API_KEY", "")
+    api_key = get_secret("EDMTRAIN_API_KEY", "")
     if not api_key:
         return _mock_edmtrain_events(city)
 
@@ -77,7 +78,7 @@ def _mock_edmtrain_events(city: str) -> list:
 # --- Bandsintown API ---
 def get_bandsintown_events(artist: str) -> list:
     """Fetch upcoming events for an artist from Bandsintown."""
-    app_id = st.secrets.get("BANDSINTOWN_APP_ID", "")
+    app_id = get_secret("BANDSINTOWN_APP_ID", "")
     if not app_id:
         return []
 
@@ -95,7 +96,7 @@ def get_bandsintown_events(artist: str) -> list:
 # --- Last.fm API ---
 def get_lastfm_trending(tag: str = "electronic", limit: int = 20) -> list:
     """Get trending tracks for a tag from Last.fm."""
-    api_key = st.secrets.get("LASTFM_API_KEY", "")
+    api_key = get_secret("LASTFM_API_KEY", "")
     if not api_key:
         return _mock_lastfm_trending(tag)
 
@@ -133,7 +134,7 @@ def _mock_lastfm_trending(tag: str) -> list:
 
 def search_lastfm_artist(artist: str) -> dict:
     """Search for artist info on Last.fm."""
-    api_key = st.secrets.get("LASTFM_API_KEY", "")
+    api_key = get_secret("LASTFM_API_KEY", "")
     if not api_key:
         return {}
 
@@ -156,7 +157,7 @@ def search_lastfm_artist(artist: str) -> dict:
 # --- MusicBrainz API ---
 def search_musicbrainz(query: str, entity: str = "recording", limit: int = 10) -> list:
     """Search MusicBrainz for tracks/artists/releases."""
-    headers = {"User-Agent": st.secrets.get("MUSICBRAINZ_USER_AGENT", "SimpleBalanceMusic/1.0")}
+    headers = {"User-Agent": get_secret("MUSICBRAINZ_USER_AGENT", "SimpleBalanceMusic/1.0")}
     url = f"https://musicbrainz.org/ws/2/{entity}/"
     params = {"query": query, "fmt": "json", "limit": limit}
     try:
@@ -172,7 +173,7 @@ def search_musicbrainz(query: str, entity: str = "recording", limit: int = 10) -
 # --- Beatport API v4 ---
 def search_beatport(query: str, genre: str = None, bpm_min: int = None, bpm_max: int = None) -> list:
     """Search Beatport catalog. Returns mock data if no API key."""
-    api_key = st.secrets.get("BEATPORT_API_KEY", "")
+    api_key = get_secret("BEATPORT_API_KEY", "")
     if not api_key:
         return _mock_beatport_search(query)
 

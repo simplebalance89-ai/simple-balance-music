@@ -19,10 +19,9 @@ except ImportError:
 
 
 def _get_token() -> str:
-    """Get Replicate API token from Streamlit secrets."""
-    if st is not None:
-        return st.secrets.get("REPLICATE_API_TOKEN", "")
-    return ""
+    """Get Replicate API token from secrets or env."""
+    from utils.secrets_helper import get_secret
+    return get_secret("REPLICATE_API_TOKEN")
 
 
 def _is_connected() -> bool:
