@@ -170,7 +170,9 @@ def parse_enterprise_result(results):
 
 def format_timestamp(seconds):
     """Convert seconds to MM:SS or HH:MM:SS."""
-    seconds = int(seconds)
+    if isinstance(seconds, str) and ':' in seconds:
+        return seconds
+    seconds = int(float(seconds))
     if seconds >= 3600:
         h = seconds // 3600
         m = (seconds % 3600) // 60
