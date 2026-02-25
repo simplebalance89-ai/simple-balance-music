@@ -42,6 +42,10 @@ def _check_api_status():
         status["Azure OpenAI"] = bool(ep and k)
     except Exception:
         status["Azure OpenAI"] = False
+    try:
+        status["AudD"] = bool(st.secrets.get("AUDD_API_TOKEN", ""))
+    except Exception:
+        status["AudD"] = False
     return status
 
 
@@ -119,6 +123,7 @@ from tabs.tab_generation import render as render_generation
 from tabs.tab_festivals import render as render_festivals
 from tabs.tab_setbuilder import render as render_setbuilder
 from tabs.tab_archive import render as render_archive
+from tabs.tab_digestor import render as render_digestor
 from tabs.tab_producer import render as render_producer
 from tabs.tab_dashboard import render as render_dashboard
 
@@ -132,6 +137,7 @@ tabs = st.tabs([
     "Events Radar",
     "Set Builder",
     "Mix Archive",
+    "Mix Digestor",
     "Producer Tools",
     "Dashboard",
 ])
@@ -153,8 +159,10 @@ with tabs[6]:
 with tabs[7]:
     render_archive()
 with tabs[8]:
-    render_producer()
+    render_digestor()
 with tabs[9]:
+    render_producer()
+with tabs[10]:
     render_dashboard()
 
 # --- Footer ---
