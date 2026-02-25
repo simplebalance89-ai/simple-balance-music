@@ -247,3 +247,174 @@ def analyze_audio(audio_path):
 def _mock_analysis(reason=""):
     """Return mock analysis when deps are missing."""
     return {"bpm": 128.0, "key": "Am", "loudness_lufs": -10.5, "peak_db": -0.3, "duration_sec": 0.0, "sample_rate": 44100, "status": "mock", "message": f"Audio analysis unavailable. {reason}".strip()}
+
+
+# ===== MISSING FUNCTIONS (9) — required by tabs =====
+
+
+def is_available():
+    """Check if audio processing dependencies are available."""
+    return HAS_PEDALBOARD or (HAS_SOUNDFILE and HAS_NUMPY)
+
+
+def apply_master_chain(audio_path, preset="mau5trap", output_path=None):
+    """Alias for master_chain — used by tab_mastering."""
+    return master_chain(audio_path, preset=preset, output_path=output_path)
+
+
+def apply_effect(audio_path, effect_name, output_path=None, **params):
+    """Apply a single named effect to audio. Used by tab_mastering individual effects."""
+    ok, msg = _check_deps("pedalboard")
+    if not ok:
+        raise ImportError(msg)
+    audio, sr = _load_audio(audio_path)
+    effect_map = {
+        "compressor": lambda: Compressor(
+            threshold_db=params.get("threshold", -20),
+            ratio=params.get("ratio", 4.0),
+            attack_ms=params.get("attack_ms", 5.0),
+            release_ms=params.get("release_ms", 50.0),
+        ),
+        "reverb": lambda: Reverb(
+            room_size=params.get("room_size", 0.5),
+            wet_level=params.get("wet", 0.3),
+            dry_level=1.0 - params.get("wet", 0.3),
+            damping=params.get("damping", 0.5),
+            width=params.get("width", 1.0),
+        ),
+        "chorus": lambda: Chorus(
+            rate_hz=params.get("rate", 1.0),
+            depth=params.get("depth", 0.25),
+            mix=params.get("mix", 0.5),
+        ),
+        "highpass": lambda: HighpassFilter(cutoff_frequency_hz=params.get("cutoff", 80.0)),
+        "lowpass": lambda: LowpassFilter(cutoff_frequency_hz=params.get("cutoff", 12000.0)),
+        "limiter": lambda: Limiter(
+            threshold_db=params.get("threshold", -1.0),
+            release_ms=params.get("release_ms", 100.0),
+        ),
+        "gain": lambda: Gain(gain_db=params.get("gain_db", 0.0)),
+    }
+    builder = effect_map.get(effect_name.lower())
+    if builder is None:
+        raise ValueError(f"Unknown effect: {effect_name}. Available: {list(effect_map.keys())}")
+    board = Pedalboard([builder()])
+    audio = board(audio, sr)
+    if output_path is None:
+        output_path = _default_output(audio_path, effect_name)
+    return _save_audio(audio, sr, output_path)
+
+
+def get_waveform_data(audio_path, max_points=2000):
+    """Return downsampled waveform data for Plotly visualization."""
+    ok, msg = _check_deps("librosa", "numpy")
+    if not ok:
+        return {"x": [], "y": [], "status": "unavailable", "message": msg}
+    try:
+        y, sr = librosa.load(audio_path, sr=None, mono=True)
+        duration = len(y) / sr
+        if len(y) > max_points:
+            step = len(y) // max_points
+            y_down = y[::step][:max_points]
+        else:
+            y_down = y
+        x = np.linspace(0, duration, len(y_down))
+        return {"x": x.tolist(), "y": y_down.tolist(), "duration": duration, "sample_rate": sr, "status": "complete"}
+    except Exception as e:
+        return {"x": [], "y": [], "status": "error", "message": str(e)}
+
+
+def get_frequency_spectrum(audio_path, n_fft=2048):
+    """Return frequency spectrum data for Plotly visualization."""
+    ok, msg = _check_deps("librosa", "numpy")
+    if not ok:
+        return {"frequencies": [], "magnitudes": [], "status": "unavailable", "message": msg}
+    try:
+        y, sr = librosa.load(audio_path, sr=None, mono=True)
+        S = np.abs(librosa.stft(y, n_fft=n_fft))
+        S_mean = S.mean(axis=1)
+        freqs = librosa.fft_frequencies(sr=sr, n_fft=n_fft)
+        S_db = 20 * np.log10(S_mean + 1e-10)
+        return {"frequencies": freqs.tolist(), "magnitudes": S_db.tolist(), "status": "complete"}
+    except Exception as e:
+        return {"frequencies": [], "magnitudes": [], "status": "error", "message": str(e)}
+
+
+def get_spectrogram_data(audio_path, n_fft=2048, hop_length=512):
+    """Return spectrogram data for Plotly heatmap visualization."""
+    ok, msg = _check_deps("librosa", "numpy")
+    if not ok:
+        return {"times": [], "frequencies": [], "spectrogram": [], "status": "unavailable", "message": msg}
+    try:
+        y, sr = librosa.load(audio_path, sr=None, mono=True)
+        S = np.abs(librosa.stft(y, n_fft=n_fft, hop_length=hop_length))
+        S_db = librosa.amplitude_to_db(S, ref=np.max)
+        freqs = librosa.fft_frequencies(sr=sr, n_fft=n_fft)
+        times = librosa.frames_to_time(np.arange(S_db.shape[1]), sr=sr, hop_length=hop_length)
+        max_freq_idx = np.searchsorted(freqs, 8000)
+        return {
+            "times": times.tolist(),
+            "frequencies": freqs[:max_freq_idx].tolist(),
+            "spectrogram": S_db[:max_freq_idx].tolist(),
+            "status": "complete",
+        }
+    except Exception as e:
+        return {"times": [], "frequencies": [], "spectrogram": [], "status": "error", "message": str(e)}
+
+
+# ===== CAMELOT WHEEL =====
+
+CAMELOT_WHEEL = {
+    "C": "8B", "Am": "8A", "G": "9B", "Em": "9A",
+    "D": "10B", "Bm": "10A", "A": "11B", "F#m": "11A",
+    "E": "12B", "C#m": "12A", "B": "1B", "G#m": "1A",
+    "F#": "2B", "D#m": "2A", "Gb": "2B", "Ebm": "2A",
+    "Db": "3B", "Bbm": "3A", "C#": "3B",
+    "Ab": "4B", "Fm": "4A", "G#": "4B",
+    "Eb": "5B", "Cm": "5A", "D#": "5B",
+    "Bb": "6B", "Gm": "6A", "A#": "6B",
+    "F": "7B", "Dm": "7A",
+}
+
+
+def key_to_camelot(key):
+    """Convert a musical key to Camelot notation."""
+    if not key:
+        return "?"
+    return CAMELOT_WHEEL.get(key, "?")
+
+
+def are_keys_compatible(key1, key2):
+    """Check if two keys are harmonically compatible (adjacent on Camelot wheel)."""
+    c1 = key_to_camelot(key1)
+    c2 = key_to_camelot(key2)
+    if c1 == "?" or c2 == "?":
+        return False
+    num1, letter1 = int(c1[:-1]), c1[-1]
+    num2, letter2 = int(c2[:-1]), c2[-1]
+    if num1 == num2 and letter1 == letter2:
+        return True
+    if num1 == num2 and letter1 != letter2:
+        return True
+    if letter1 == letter2 and abs(num1 - num2) == 1:
+        return True
+    if letter1 == letter2 and sorted([num1, num2]) == [1, 12]:
+        return True
+    return False
+
+
+def get_compatible_camelot(key):
+    """Return list of compatible Camelot keys for a given key."""
+    camelot = key_to_camelot(key)
+    if camelot == "?":
+        return []
+    num, letter = int(camelot[:-1]), camelot[-1]
+    compatible = []
+    compatible.append(f"{num}{letter}")
+    other = "A" if letter == "B" else "B"
+    compatible.append(f"{num}{other}")
+    up = num + 1 if num < 12 else 1
+    down = num - 1 if num > 1 else 12
+    compatible.append(f"{up}{letter}")
+    compatible.append(f"{down}{letter}")
+    return compatible
