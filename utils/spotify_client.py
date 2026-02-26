@@ -13,9 +13,11 @@ except ImportError:
     spotipy = None
     HAS_SPOTIFY = False
 
-SPOTIFY_CLIENT_ID = "a3fcdeaa8be54f2392bc3b88f849b6af"
-SPOTIFY_CLIENT_SECRET = "33c2801c30314da38e4349404c22bb03"
-SPOTIFY_REDIRECT_URI = "https://simple-balance-music.streamlit.app"
+from utils.secrets_helper import get_secret
+
+SPOTIFY_CLIENT_ID = get_secret("SPOTIFY_CLIENT_ID")
+SPOTIFY_CLIENT_SECRET = get_secret("SPOTIFY_CLIENT_SECRET")
+SPOTIFY_REDIRECT_URI = get_secret("SPOTIFY_REDIRECT_URI", "https://simple-balance-music-1.onrender.com")
 SPOTIFY_SCOPE = "user-library-read user-top-read playlist-read-private playlist-read-collaborative user-read-recently-played"
 
 
