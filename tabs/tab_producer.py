@@ -59,6 +59,7 @@ SCALE_NAMES = list(SCALE_INTERVALS.keys()) if HAS_MIDI else ["major", "minor"]
 
 
 def render():
+    st.info("🔧 Testing in Progress — Producer tools require local audio/MIDI engines. Functionality being validated.")
     st.markdown("### Producer Tools")
     st.caption("Reference analysis. Scale/key tools. Production AI advisor.")
 

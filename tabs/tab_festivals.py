@@ -66,6 +66,7 @@ EVENTS_SYSTEM_PROMPT = (
 
 
 def render():
+    st.warning("⚠️ TBD — Event data is placeholder. Real event integration coming soon.")
     st.markdown("### Festival & Events Radar")
     st.caption("Track shows. Filter by city. Never miss a mau5trap night.")
 
@@ -167,6 +168,7 @@ def render():
 
         if chat:
             st.markdown("#### Event Advisor")
+            st.caption("AI-generated suggestions — verify all event details independently before purchasing tickets.")
             ck = "fest_messages"
             if ck not in st.session_state:
                 st.session_state[ck] = []

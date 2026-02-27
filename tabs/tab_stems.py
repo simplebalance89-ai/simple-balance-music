@@ -19,6 +19,7 @@ except ImportError:
 
 
 def render():
+    st.info("🔧 Testing in Progress — Stem separation via Replicate. Model version being validated.")
     st.markdown("### Stem Separation Lab")
     st.caption("Separate any track into vocals, drums, bass, and other. Powered by Demucs (Meta) via Replicate.")
 

@@ -42,6 +42,7 @@ MASTER_PRESETS = {
 
 
 def render():
+    st.info("🔧 Testing in Progress — Using Pedalboard engine. Dolby.io integration pending.")
     st.markdown("### AI Mastering Studio")
     st.caption("Real-time mastering with Spotify Pedalboard. Cloud mastering via Dolby.io.")
 

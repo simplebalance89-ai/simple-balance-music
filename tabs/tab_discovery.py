@@ -97,6 +97,7 @@ Music is medicine. Find the right prescription."""
 
 
 def render():
+    st.warning("⚠️ TBD — Spotify discovery features are being rebuilt. Some functions may not work.")
     st.markdown("### Music Discovery & Breaking Artists")
     st.caption("Find tracks by mood, meaning, and connection. Scout emerging talent.")
 
@@ -230,12 +231,19 @@ def render():
 
                 if st.button("Pull", key="spot_pull"):
                     if spot_action == "Top Tracks":
-                        tracks = get_top_tracks(client, time_range="medium_term", limit=20)
+                        try:
+                            tracks = get_top_tracks(client, time_range="medium_term", limit=20)
+                        except Exception as e:
+                            tracks = [{"error": str(e)}]
+                            st.error(f"Spotify API error: {e}")
                         track_ids = [t["id"] for t in tracks if "error" not in t and t.get("id")]
                         features = {}
                         if track_ids:
-                            af = get_audio_features(client, track_ids[:20])
-                            features = {f["id"]: f for f in af if "error" not in f}
+                            try:
+                                af = get_audio_features(client, track_ids[:20])
+                                features = {f["id"]: f for f in af if "error" not in f}
+                            except Exception:
+                                st.caption("Audio features unavailable (Spotify endpoint deprecated).")
                         for t in tracks:
                             if "error" not in t:
                                 f = features.get(t.get("id"), {})

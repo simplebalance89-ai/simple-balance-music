@@ -41,6 +41,7 @@ MUSICGEN_MODELS = {
 
 
 def render():
+    st.info("🔧 Testing in Progress — Music generation via Replicate. Model version being validated.")
     st.markdown("### AI Music Generation")
     st.caption("Generate music with MusicGen (Meta) via Replicate. Create MIDI with AI. mau5trap presets built in.")
 

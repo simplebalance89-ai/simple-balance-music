@@ -24,6 +24,7 @@ except ImportError:
 
 
 def render():
+    st.info("🔧 Testing in Progress — AudD enterprise API. Upload functionality being validated.")
     st.markdown("### Mix Digestor")
     st.caption("Drop a mix. Get every track. Powered by AudD audio fingerprinting.")
 
